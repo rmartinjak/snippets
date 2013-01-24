@@ -19,16 +19,19 @@ int tipe_init(tipe *t, size_t size, size_t nmemb)
         return -1;
     }
 
-    if (sem_init(t->fill, 0, 0)) {
+    if (sem_init(t->fill, 0, 0))
+    {
         return -1;
     }
 
-    if (sem_init(t->empty, 0, nmemb)) {
+    if (sem_init(t->empty, 0, nmemb))
+    {
         sem_destroy(t->fill);
         return -1;
     }
 
-    if (sem_init(t->mutex, 0, 1)) {
+    if (sem_init(t->mutex, 0, 1))
+    {
         sem_destroy(t->fill);
         sem_destroy(t->empty);
         return -1;
@@ -74,7 +77,9 @@ void tipe_close(tipe *t)
 int tipe_write(tipe *t, void *obj)
 {
     if (!t->open)
+    {
         return -1;
+    }
 
     sem_wait(t->empty);
     sem_wait(t->mutex);
@@ -93,7 +98,9 @@ int tipe_write(tipe *t, void *obj)
 int tipe_read(tipe *t, void *obj)
 {
     if (!t->open && !t->pos)
+    {
         return -1;
+    }
 
     sem_wait(t->fill);
     sem_wait(t->mutex);
