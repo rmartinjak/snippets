@@ -4,12 +4,6 @@
 #include <string.h>
 #include <errno.h>
 
-#ifndef DEBUG
-#define NDEBUG
-#endif
-
-#include <assert.h>
-
 
 int tipe_init(tipe *t, size_t size, size_t nmemb)
 {
@@ -84,8 +78,6 @@ int tipe_write(tipe *t, void *obj)
     sem_wait(t->empty);
     sem_wait(t->mutex);
 
-    assert(t->pos < t->nmemb);
-
     memcpy(&t->buf[t->size * t->pos], obj, t->size);
     t->pos++;
 
@@ -104,8 +96,6 @@ int tipe_read(tipe *t, void *obj)
 
     sem_wait(t->fill);
     sem_wait(t->mutex);
-
-    assert(t->pos > 0);
 
     t->pos--;
     memcpy(obj, &t->buf[t->size * t->pos], t->size);
