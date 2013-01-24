@@ -6,4 +6,4 @@ misc code snippets:
 C
 -
 
-* `tipe`: **t**hreaded version of a p**ipe** (similar to *channels* in Go)
+* `tipe`: __t__hreaded version of a p__ipe__ (similar to *channels* in Go)
