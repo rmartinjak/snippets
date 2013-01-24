@@ -13,25 +13,13 @@ int tipe_init(tipe *t, size_t size, size_t nmemb)
         return -1;
     }
 
-    if (sem_init(t->fill, 0, 0))
-    {
-        return -1;
-    }
+    t->buf = malloc(size * nmemb);
 
-    if (sem_init(t->empty, 0, nmemb))
-    {
-        sem_destroy(t->fill);
-        return -1;
-    }
-
-    if (sem_init(t->mutex, 0, 1))
-    {
-        sem_destroy(t->fill);
-        sem_destroy(t->empty);
-        return -1;
-    }
-
-    if (!(t->buf = malloc(size * nmemb)))
+    if (!t->buf
+        || sem_init(t->fill, 0, 0)
+        || sem_init(t->empty, 0, nmemb)
+        || sem_init(t->mutex, 0, 1)
+    )
     {
         sem_destroy(t->fill);
         sem_destroy(t->empty);
