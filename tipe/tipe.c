@@ -16,7 +16,7 @@ int tipe_init(tipe *t, size_t size, size_t nmemb)
 
     if (!t->buf
             || sem_init(t->fill, 0, 0)
-            || sem_init(t->empty, 0, nmemb)
+            || sem_init(t->empty, 0, nmemb - 1)
             || sem_init(t->mutex, 0, 1)
        )
     {
@@ -70,7 +70,7 @@ int tipe_write(tipe *t, void *obj)
             obj,
             t->size
           );
-    t->writepos = (t->wpos + 1) % t->nmemb;
+    t->writepos = (t->writepos + 1) % t->nmemb;
 
     sem_post(t->mutex);
     sem_post(t->fill);
@@ -89,11 +89,11 @@ int tipe_read(tipe *t, void *obj)
     sem_wait(t->mutex);
 
     memcpy(
-            bj,
+            obj,
             &t->buf[t->size * t->readpos],
             t->size
           );
-    t->readpos = (t->rpos + 1) % t->nmemb;
+    t->readpos = (t->readpos + 1) % t->nmemb;
 
     sem_post(t->mutex);
     sem_post(t->empty);
