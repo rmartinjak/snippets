@@ -1,3 +1,6 @@
+#ifndef TICTOC_H
+#define TICTOC_H
+
 #include <stdio.h>
 #include <time.h>
 
@@ -31,3 +34,5 @@ static void tictoc(const char *toc_str, FILE *f)
         fprintf(f, "%-10s\t: %f\n", toc_str, d);
     }
 }
+
+#endif
