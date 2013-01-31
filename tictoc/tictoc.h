@@ -1,6 +1,23 @@
 #ifndef TICTOC_H
 #define TICTOC_H
 
+/* example:
+
+    #include "tictoc.h"
+    #include <unistd.h>
+
+    int main(void)
+    {
+       TIC();
+       sleep(1);
+       TOC("i slept this long");
+       return 0;
+    }
+
+  output (approx.):
+    i slept this long   : 1.000135
+ */
+
 #include <stdio.h>
 #include <time.h>
 
