@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 struct line
 {
@@ -92,6 +93,7 @@ void shuffle_file(const char *filename)
 int main(int argc, char **argv)
 {
     char *fn;
+    srand(time(NULL));
     while ((fn = *++argv))
         shuffle_file(fn);
 
