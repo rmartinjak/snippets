@@ -44,7 +44,7 @@ void shuffle_file(const char *filename)
     struct line root;
     int c;
     FILE *f;
-    long pos;
+    long lines, pos;
     size_t len;
 
     root.next = &root;
@@ -57,12 +57,14 @@ void shuffle_file(const char *filename)
         return;
     }
 
+    lines = 1;
     pos = 0;
     len = 1;
     while ((c = fgetc(f)) != EOF) {
         len++;
         if (c == '\n')
         {
+            lines++;
             line_add(&root, pos, len);
             pos = ftell(f);
             len = 1;
@@ -74,7 +76,7 @@ void shuffle_file(const char *filename)
 
     while (root.next != &root) {
         struct line *r = &root;
-        struct line *ln = line_get(r, random() % 256);
+        struct line *ln = line_get(r, random() % lines);
 
         if (ln == &root)
             continue;
