@@ -89,6 +89,7 @@ void shuffle_file(const char *filename)
         }
         line_del(ln);
         free(ln);
+        lines--;
     }
 }
 
