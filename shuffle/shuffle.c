@@ -59,7 +59,7 @@ void shuffle_file(const char *filename)
 
     lines = 1;
     pos = 0;
-    len = 1;
+    len = 0;
     while ((c = fgetc(f)) != EOF) {
         len++;
         if (c == '\n')
@@ -67,10 +67,7 @@ void shuffle_file(const char *filename)
             lines++;
             line_add(&root, pos, len);
             pos = ftell(f);
-            len = 1;
-            c = fgetc(f);
-            if (c == EOF)
-                break;
+            len = 0;
         }
     }
 
