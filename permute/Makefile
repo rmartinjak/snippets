@@ -2,8 +2,8 @@ include ../Makefile.include
 
 default : test
 
-test : permute.c
-	@$(CC) $(CFLAGS) -DPERMUTE_TEST -o $@ $<
+test : permute_test.c
+	@$(CC) $(CFLAGS) -o $@ $<
 	@./$@
 	@rm $@
 
