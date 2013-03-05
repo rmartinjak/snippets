@@ -73,7 +73,7 @@ void shuffle_file(const char *filename)
 
     while (root.next != &root) {
         struct line *r = &root;
-        struct line *ln = line_get(r, random() % lines);
+        struct line *ln = line_get(r, rand() % lines);
 
         if (ln == &root)
             continue;
@@ -92,10 +92,9 @@ void shuffle_file(const char *filename)
 
 int main(int argc, char **argv)
 {
-    char *fn;
     srand(time(NULL));
-    while ((fn = *++argv))
-        shuffle_file(fn);
+    while (*++argv)
+        shuffle_file(*argv);
 
     return EXIT_SUCCESS;
 }
