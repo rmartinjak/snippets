@@ -30,7 +30,9 @@ int print_line(FILE *f)
 
     while ((c = fgetc(f)) != EOF && c != '\n')
         putchar(c);
-    putchar('\n');
+
+    if (c == '\n')
+        putchar(c);
 
     return c;
 }
