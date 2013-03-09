@@ -1,0 +1,13 @@
+DESTDIR ?= ~
+
+clean :
+	rm $(TARGETS)
+
+install : $(TARGETS)
+	@install -d ${DESTDIR}${PREFIX}/bin
+	install -m 755 -t ${DESTDIR}${PREFIX}/bin $^
+
+uninstall :
+	rm -f $(addprefix ${DESTDIR}${PREFIX}/bin/, $(TARGETS))
+
+.PHONY : clean install uninstall

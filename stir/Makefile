@@ -1,7 +1,5 @@
-CC = cc
-CFLAGS += -O2 -std=c89 -pedantic -Wall -Wextra
-
-all: stir shake
+TARGETS = stir shake
+include ../Makefile.head
 
 stir : stir.c
 	@$(CC) $(CFLAGS) -o $@ $^
@@ -9,7 +7,4 @@ stir : stir.c
 shake : stir.c
 	@$(CC) $(CFLAGS) -DSHAKE -o $@ $^
 
-clean :
-	@rm -f stir shake
-
-.PHONY : clean
+include ../Makefile.tail

@@ -1,6 +1,5 @@
-include ../Makefile.include
-
-default : test
+TARGETS = test
+include ../Makefile.head
 
 test : permute_test.c
 	@$(CC) $(CFLAGS) -o $@ $<

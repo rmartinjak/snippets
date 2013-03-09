@@ -1,6 +1,7 @@
-include ../Makefile.include
+TARGETS = shuffle
+include ../Makefile.head
 
-default : shuffle
+shuffle : shuffle.c
+	$(CC) $(CFLAGS) -o $@ $<
 
-% : %.c
-	@$(CC) $(CFLAGS) -o $@ $<
+include ../Makefile.tail
