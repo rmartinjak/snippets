@@ -12,18 +12,32 @@
 /* example:
 
     #include "tictoc.h"
+    #include <stdlib.h>
+    #include <time.h>
     #include <unistd.h>
 
     int main(void)
     {
-       TIC();
-       sleep(1);
-       TOC("i slept this long");
-       return 0;
+        int i = 4;
+        srand(time(NULL));
+
+        TIC();
+        while (i--) {
+            TIC();
+            sleep(rand() % 3);
+            TOC("inner");
+        }
+        TOC("outer");
+        return 0;
     }
 
-  output (approx.):
-    i slept this long   : 1.000135
+
+  outputs:
+    inner       : 2.000181
+    inner       : 1.000169
+    inner       : 2.000177
+    inner       : 0.000003
+    outer       : 5.000725
  */
 
 #include <stdio.h>
