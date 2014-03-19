@@ -7,7 +7,12 @@
 */
 
 
-/* usage:
+/*
+   This is a very feature-poor implementaton. If you want something better,
+   visit http://www.leonerd.org.uk/code/libpack
+
+
+   usage:
 
     pack(unsigned char *buf, const char *fmt, ...);
 
