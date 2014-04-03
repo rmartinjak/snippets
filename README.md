@@ -12,3 +12,4 @@ C
 * `stir`: merge files line-by-line. also compiles `shake` which randomizes the lines a bit
 * `permute`: fill array of size n with a random permutation of [1, n]
 * `pack`: pack and unpack fixed-size integers to and from byte arrays
+* `ppopts`: pretty-print command line options
