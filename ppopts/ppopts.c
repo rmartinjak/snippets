@@ -153,7 +153,9 @@ ppopts_print(struct ppopts *o, FILE *stream, int wrap, int flags)
         switch (opt->shortopt) {
 
         case PPOPTS_HEADER:
-            fputc('\n', stream);
+            if (i) {
+                fputc('\n', stream);
+            }
         case PPOPTS_TEXT:
             print_desc(stream, opt->desc, 0, wrap);
             break;
