@@ -9,7 +9,7 @@
 #define PPOPTS_LONGOPT_MAX 30
 #define PPOPTS_ARGNAME_MAX 10
 #define PPOPTS_DESC_MAX 4096
-#define PPOPTS_OPTS_MAX 30
+#define PPOPTS_OPTS_MAX 50
 
 
 struct ppopts
