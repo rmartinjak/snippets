@@ -17,6 +17,9 @@
  *   with automatic formatting.
  * - Optionally hide all long descriptions (e.g. if getopt_long() is not
  *   available)
+ * - "Header" and "text" items to display text before or between options
+ *   (headers are just like text, except that a blank line is printed _before_
+ *   instead of _after_ it).
  *
  *
  *
