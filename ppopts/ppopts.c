@@ -139,6 +139,12 @@ ppopts_print(struct ppopts *o, FILE *stream, int wrap, int flags)
         if (!(flags & PPOPTS_NO_LONGOPTS)) {
             indent += FMT_LONG_WIDTH + w_long + w_arg;
         }
+
+        /* no space for desc -> always put it on the next line */
+        if (indent  > wrap) {
+            wrap = indent - SPACE_BEFORE_DESC;
+            indent = -1;
+        }
     }
 
     for (i = 0; i < o->n; i++) {
