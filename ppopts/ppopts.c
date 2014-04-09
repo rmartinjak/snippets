@@ -73,6 +73,20 @@ get_word(char *dest, int n, char *src, char **next)
 
 
 static void
+print_desc_literal(FILE *stream, char *desc)
+{
+    char *s = desc;
+    fputc('\n', stream);
+    for (; *s; s++) {
+        if (s == desc || s[-1] == '\n') {
+            fprintf(stream, "%*s", SPACE_BEFORE_DESC, "");
+        }
+        fputc(*s, stream);
+    }
+    fputc('\n', stream);
+}
+
+static void
 print_desc(FILE *stream, char *desc, int indent, int wrap)
 {
     char *s = desc;
@@ -130,7 +144,12 @@ ppopts_print(struct ppopts *o, FILE *stream, int wrap, int flags)
                     w_long, opt->longopt, w_arg, opt->argname);
         }
         fprintf(stream, "%*s", SPACE_BEFORE_DESC, "");
-        print_desc(stream, opt->desc, indent, wrap);
+        if (strchr(opt->desc, '\n')) {
+            print_desc_literal(stream, opt->desc);
+        }
+        else {
+            print_desc(stream, opt->desc, indent, wrap);
+        }
     }
 }
 
@@ -142,6 +161,7 @@ int main(void)
     ppopts_add(&ppopts, 'o', "option", "ARG", "Some long and very descriptive text. I hope it is long enough to wrap");
     ppopts_add(&ppopts, 'l', "longeroption", "LONGERARG", "Another long and very descriptive text. I hope it is long enough to wrap even if we use PPOPTS_DESC_ON_NEXT_LINE.");
     ppopts_add(&ppopts, 's', "super", "FOO", "This is another supercalifragilisticexpialidocious option! Yeah");
+    ppopts_add(&ppopts, 'n', "newline", "X", "This option contains a newline:\nit shall always be printed literally (including   all  \t whitespace).");
     ppopts_print(&ppopts, stdout, 80, 0);
     printf("\n\n");
     ppopts_print(&ppopts, stdout, 80, PPOPTS_NO_LONGOPTS);
