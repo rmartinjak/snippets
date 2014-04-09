@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <ctype.h>
 #include <string.h>
 
@@ -11,6 +12,7 @@
 #define FMT_LONG_WIDTH 5
 #define SPACE_BEFORE_DESC 4
 
+
 void
 ppopts_init(struct ppopts *o)
 {
@@ -19,17 +21,22 @@ ppopts_init(struct ppopts *o)
 
 
 void
-ppopts_add(struct ppopts *o, char shortopt, const char *longopt,
-           const char *argname, const char *desc)
+ppopts_add(struct ppopts *o, int shortopt, const char *longopt,
+           const char *argname, const char *desc, ...)
 {
     int len;
     struct ppopts_opt *opt;
+    va_list ap;
+
     if (o->n >= PPOPTS_OPTS_MAX) {
         return;
     }
     opt = &o->options[o->n];
     opt->shortopt = shortopt;
-    strncpy(opt->desc, desc, PPOPTS_DESC_MAX);
+
+    va_start(ap, desc);
+    vsnprintf(opt->desc, sizeof opt->desc, desc, ap);
+    va_end(ap);
 
     strncpy(opt->longopt, longopt, PPOPTS_LONGOPT_MAX);
     len = strlen(longopt);
@@ -86,6 +93,7 @@ print_desc_literal(FILE *stream, char *desc)
     fputc('\n', stream);
 }
 
+
 static void
 print_desc(FILE *stream, char *desc, int indent, int wrap)
 {
@@ -135,20 +143,32 @@ ppopts_print(struct ppopts *o, FILE *stream, int wrap, int flags)
 
     for (i = 0; i < o->n; i++) {
         struct ppopts_opt *opt = &o->options[i];
-        if (i) {
+
+        switch (opt->shortopt) {
+
+        case PPOPTS_HEADER:
             fputc('\n', stream);
+        case PPOPTS_TEXT:
+            print_desc(stream, opt->desc, 0, wrap);
+            break;
+
+        default:
+            fprintf(stream, FMT_SHORT, opt->shortopt, w_arg, opt->argname);
+            if (!(flags & PPOPTS_NO_LONGOPTS)) {
+                fprintf(stream, FMT_LONG,
+                        w_long, opt->longopt, w_arg, opt->argname);
+            }
+            fprintf(stream, "%*s", SPACE_BEFORE_DESC, "");
+            if (strchr(opt->desc, '\n')) {
+                print_desc_literal(stream, opt->desc);
+            }
+            else {
+                print_desc(stream, opt->desc, indent, wrap);
+            }
         }
-        fprintf(stream, FMT_SHORT, opt->shortopt, w_arg, opt->argname);
-        if (!(flags & PPOPTS_NO_LONGOPTS)) {
-            fprintf(stream, FMT_LONG,
-                    w_long, opt->longopt, w_arg, opt->argname);
-        }
-        fprintf(stream, "%*s", SPACE_BEFORE_DESC, "");
-        if (strchr(opt->desc, '\n')) {
-            print_desc_literal(stream, opt->desc);
-        }
-        else {
-            print_desc(stream, opt->desc, indent, wrap);
+
+        if (i < o->n - 1 && opt->shortopt != PPOPTS_HEADER) {
+            fputc('\n', stream);
         }
     }
 }
@@ -157,16 +177,18 @@ ppopts_print(struct ppopts *o, FILE *stream, int wrap, int flags)
 #ifdef PPOPTS_TEST
 int main(void)
 {
-    struct ppopts ppopts = PPOPTS_INITIALIZER;
-    ppopts_add(&ppopts, 'o', "option", "ARG", "Some long and very descriptive text. I hope it is long enough to wrap");
-    ppopts_add(&ppopts, 'l', "longeroption", "LONGERARG", "Another long and very descriptive text. I hope it is long enough to wrap even if we use PPOPTS_DESC_ON_NEXT_LINE.");
-    ppopts_add(&ppopts, 's', "super", "FOO", "This is another supercalifragilisticexpialidocious option! Yeah");
-    ppopts_add(&ppopts, 'n', "newline", "X", "This option contains a newline:\nit shall always be printed literally (including   all  \t whitespace).");
-    ppopts_print(&ppopts, stdout, 80, 0);
+    struct ppopts opt = PPOPTS_INITIALIZER;
+    ppopts_add_header(&opt, "Some options:");
+    ppopts_add(&opt, 'o', "option", "ARG", "Some long and very descriptive text. I hope it is long enough to wrap");
+    ppopts_add(&opt, 'l', "longeroption", "LONGERARG", "Another long and very descriptive text. I hope it is long enough to wrap even if we use PPOPTS_DESC_ON_NEXT_LINE.");
+    ppopts_add(&opt, 's', "super", "FOO", "This is another supercalifragilisticexpialidocious option! Yeah");
+    ppopts_add_text(&opt, "FOO should be < %d", 3);
+    ppopts_add(&opt, 'n', "newline", "X", "This option contains a newline:\nit shall always be printed literally (including   all  \t whitespace).");
+    ppopts_print(&opt, stdout, 80, 0);
     printf("\n\n");
-    ppopts_print(&ppopts, stdout, 80, PPOPTS_NO_LONGOPTS);
+    ppopts_print(&opt, stdout, 80, PPOPTS_NO_LONGOPTS);
     printf("\n\n");
-    ppopts_print(&ppopts, stdout, 80, PPOPTS_DESC_ON_NEXT_LINE);
+    ppopts_print(&opt, stdout, 80, PPOPTS_DESC_ON_NEXT_LINE);
     return EXIT_SUCCESS;
 }
 #endif

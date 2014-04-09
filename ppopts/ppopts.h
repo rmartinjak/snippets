@@ -59,11 +59,14 @@
 #define PPOPTS_DESC_MAX 4096
 #define PPOPTS_OPTS_MAX 50
 
+#define PPOPTS_HEADER 128
+#define PPOPTS_TEXT 129
+
 
 struct ppopts
 {
     struct ppopts_opt {
-        char shortopt;
+        int shortopt;
         char longopt[PPOPTS_LONGOPT_MAX + 1];
         char argname[PPOPTS_ARGNAME_MAX + 1];
         char desc[PPOPTS_DESC_MAX + 1];
@@ -79,8 +82,16 @@ struct ppopts
 void ppopts_init(struct ppopts *o);
 
 
-void ppopts_add(struct ppopts *o, char shortopt, const char *longopt,
-                const char *argname, const char *desc);
+void ppopts_add(struct ppopts *o, int shortopt, const char *longopt,
+                const char *argname, const char *desc, ...);
+
+
+#define ppopts_add_header(o, ...) \
+    ppopts_add((o), PPOPTS_HEADER, "", "", __VA_ARGS__)
+
+
+#define ppopts_add_text(o, ...) \
+    ppopts_add((o), PPOPTS_TEXT, "", "", __VA_ARGS__)
 
 
 void ppopts_print(struct ppopts *o, FILE *stream, int wrap, int flags);
