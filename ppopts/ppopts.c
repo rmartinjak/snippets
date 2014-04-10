@@ -1,3 +1,14 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#if HAVE_GETOPT_LONG
+#define _GNU_SOURCE
+#include <getopt.h>
+#else
+#include <unistd.h>
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -31,6 +42,7 @@ ppopts_add(struct ppopts *o, int shortopt, const char *longopt,
     if (o->n >= PPOPTS_OPTS_MAX) {
         return;
     }
+
     opt = &o->options[o->n];
     opt->shortopt = shortopt;
 
@@ -136,9 +148,9 @@ ppopts_print(struct ppopts *o, FILE *stream, int wrap, int flags)
     }
     else {
         indent = SPACE_BEFORE_DESC + FMT_SHORT_WIDTH + w_arg;
-        if (!(flags & PPOPTS_NO_LONGOPTS)) {
-            indent += FMT_LONG_WIDTH + w_long + w_arg;
-        }
+#if HAVE_GETOPT_LONG
+        indent += FMT_LONG_WIDTH + w_long + w_arg;
+#endif
 
         /* no space for desc -> always put it on the next line */
         if (indent  > wrap) {
@@ -162,10 +174,10 @@ ppopts_print(struct ppopts *o, FILE *stream, int wrap, int flags)
 
         default:
             fprintf(stream, FMT_SHORT, opt->shortopt, w_arg, opt->argname);
-            if (!(flags & PPOPTS_NO_LONGOPTS)) {
+#if HAVE_GETOPT_LONG
                 fprintf(stream, FMT_LONG,
                         w_long, opt->longopt, w_arg, opt->argname);
-            }
+#endif
             fprintf(stream, "%*s", SPACE_BEFORE_DESC, "");
             if (strchr(opt->desc, '\n')) {
                 print_desc_literal(stream, opt->desc);
@@ -182,6 +194,45 @@ ppopts_print(struct ppopts *o, FILE *stream, int wrap, int flags)
 }
 
 
+int
+ppopts_getopt(struct ppopts *o, int argc, char * const argv[])
+{
+    int i, k;
+    char shortopts[PPOPTS_OPTS_MAX * 2 + 1];
+#if HAVE_GETOPT_LONG
+    struct option longopts[PPOPTS_OPTS_MAX + 1];
+#endif
+
+    for (i = 0, k = 0; i < o->n; i++) {
+        struct ppopts_opt *opt = &o->options[i];
+        char so[3] = { opt->shortopt };
+        if (opt->shortopt > SCHAR_MAX) {
+            continue;
+        }
+        /* if argname is nonempty, make this a required option */
+        if (*opt->argname) {
+            so[1] = ':';
+        }
+        strcat(shortopts, so);
+#if HAVE_GETOPT_LONG
+        longopts[k] = (struct option){
+            .name = opt->longopt,
+            .has_arg = *opt->argname ? required_argument : no_argument,
+            .flag = NULL,
+            .val = opt->shortopt,
+        };
+#endif
+        k++;
+    }
+    longopts[k] = (struct option){ 0, 0, 0, 0 };
+#if HAVE_GETOPT_LONG
+    return getopt_long(argc, argv, shortopts, longopts, NULL);
+#else
+    return getopt(argc, argv, shortopts);
+#endif
+}
+
+
 #ifdef PPOPTS_TEST
 int main(void)
 {
@@ -193,8 +244,6 @@ int main(void)
     ppopts_add_text(&opt, "FOO should be < %d", 3);
     ppopts_add(&opt, 'n', "newline", "X", "This option contains a newline:\nit shall always be printed literally (including   all  \t whitespace).");
     ppopts_print(&opt, stdout, 80, 0);
-    printf("\n\n");
-    ppopts_print(&opt, stdout, 80, PPOPTS_NO_LONGOPTS);
     printf("\n\n");
     ppopts_print(&opt, stdout, 80, PPOPTS_DESC_ON_NEXT_LINE);
     return EXIT_SUCCESS;

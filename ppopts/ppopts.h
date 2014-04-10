@@ -49,12 +49,12 @@
  *          literal description text.
  */
 
+#include <stdio.h>
+#include <limits.h>
 
-/** Don't pring long options */
-#define PPOPTS_NO_LONGOPTS (1 << 0)
 
 /** Always print the descriptions on the next line */
-#define PPOPTS_DESC_ON_NEXT_LINE (1 << 1)
+#define PPOPTS_DESC_ON_NEXT_LINE (1 << 0)
 
 
 #define PPOPTS_LONGOPT_MAX 30
@@ -62,9 +62,10 @@
 #define PPOPTS_DESC_MAX 4096
 #define PPOPTS_OPTS_MAX 50
 
-#define PPOPTS_HEADER 128
-#define PPOPTS_TEXT 129
-
+enum {
+    PPOPTS_HEADER = SCHAR_MAX + 1,
+    PPOPTS_TEXT
+};
 
 struct ppopts
 {
@@ -98,4 +99,7 @@ void ppopts_add(struct ppopts *o, int shortopt, const char *longopt,
 
 
 void ppopts_print(struct ppopts *o, FILE *stream, int wrap, int flags);
+
+
+int ppopts_getopt(struct ppopts *o, int argc, char * const argv[]);
 #endif
