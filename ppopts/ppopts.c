@@ -1,3 +1,10 @@
+/* Copyright (c) 2014 Robin Martinjak <robin@rmartinjak.de>
+ *
+ * Copying and distribution of this file, with or without modification, are
+ * permitted in any medium without royalty provided the copyright notice
+ * and this notice are preserved.
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
